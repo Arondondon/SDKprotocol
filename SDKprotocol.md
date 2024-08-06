@@ -28,11 +28,11 @@ required for the operation of the functional level.
 - [Config Layer](#config-layer)
   1. [Account](#account)
   2. [EthAccount](#ethaccount)
-  3. [Config]()
-- [Interface Layer]()
-  1. [SNETEngine]()
-  2. [Service]()
-  3. [ServiceByGRPC]()
+  3. [Config](#config)
+- [Interface Layer](#interface-layer)
+  1. [SNETEngine](#snetengine)
+  2. [Service](#service)
+  3. [ServiceByGRPC](#servicebygrpc)
 - [Functional Layer]()
   1. [Contract]()
   2. [EthContract]()
@@ -132,6 +132,39 @@ Moreover, most of the functions are accessible from `SNETEngine`.
 
 - `config` - `Config`'s instance 
 - `w3` - an instance of the Web3 library class that allows working with the blockchain via Web3
-- 
+- `agix` - `AGIXContract`'s instance
+- `mpe` - `MPEContract`'s instance
+- `registry` - `RegistryContract`'s instance
+- `services` - list (map) of `Service`'s instances
+- `metadata_provider` - `IPFSMetadataProvider`'s instance
+- `channels` - `Channels`'s instance
 
 ##### methods
+
+- _Constructor_ - takes `Config`'s instance and assign it to field `config`, 
+initializes the remaining fields using the constructors of the corresponding entities
+- `create_account` - takes _name_, _account_type_, _key_or_mnemonic_ (optional)
+and _index_ (optional), creates `EthAccount`'s instance and appends it to `config`
+- `create_service` - takes _org_id_, _service_id_, _group_name_ (optional), etc.,
+creates `ServiceByGRPC`'s instance and returns it
+- `mpe_contract` - returns `mpe`
+- `agix_contract` - returns `agix`
+- `registry` - returns `registry`
+- `metadata_provider` - returns `metadata_provider`
+
+---
+
+#### Service
+
+`Service` is an abstract entity.
+
+##### methods
+
+- `call` - calls service
+
+---
+
+#### ServiceByGRPC
+
+
+
