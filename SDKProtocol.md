@@ -69,7 +69,6 @@ required for the operation of the functional level.
 
 - `get_name` - *abstract method* to get account name
 
-
 ---
 
 #### EthAccount
