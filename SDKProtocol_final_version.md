@@ -31,15 +31,15 @@ required for the operation of the functional level.
   3. [Config](#config)
 - [Interface Layer](#interface-layer)
   1. [SNETEngine](#snetengine)
-  2. [Service](#service)
-  3. [ServiceByGRPC](#servicebygrpc)
+  2. [ServiceClient](#serviceclient)
+  3. [ServiceClientByGRPC](#serviceclientbygrpc)
 - [Functional Layer](#functional-layer)
   1. [Contract](#contract)
   2. [EthContract](#ethcontract)
-  3. [MPEContract]()
-  4. [RegistryContract]()
-  5. [MetadataProvider]()
-  6. [IPFSMetadataProvider]()
+  3. [MPEContract](#mpecontract)
+  4. [RegistryContract](#registrycontract)
+  5. [MetadataProvider](#metadataprovider)
+  6. [IPFSMetadataProvider](#ipfsmetadataprovider)
   7. [PaymentChannel]()
   8. [Channels]()
 - [Tools Layer]()
@@ -123,7 +123,7 @@ an instance, which is then passed to `SNETEngine`.
 #### SNETEngine
 
 `SNETEngine` is the most important entity from the user side. `Config`'s instance 
-is installed in it, and new accounts and services are created by using it. 
+is installed in it, and new accounts and service clients are created by using it. 
 `SNETEngine` creates and contains instances of almost all entities from 
 `Functional Layer` (`MPEContract`, `RegistryContract`, `MetadatProvider` etc.), 
 so they are accessed through it, and therefore most of the SDK functions are accessible 
@@ -144,37 +144,59 @@ from `SNETEngine`.
 
 - creating new `Account`
 - creating and initializing new `Service`
-- providing the user with access to the contracts and metadata provider or to their functionality
+- providing the user with access to `MPEContract`'s instance or to its functionality
+- providing the user with access to `RegistryContract`'s instance or to its functionality
+- providing the user with access to `AGIXContract`'s instance or to its functionality
+- providing the user with access to metadata provider or to its functionality
 
 ---
 
-needs to be rewritten
+#### ServiceClient
 
-#### Service
+`Service` is an entity that allows an account to call a service and also call contracts and 
+metadata provider functionality related on service. It contains the most important abstract method `call` for 
+calling a service with given parameters. It's the base class to `ServiceClientByGRPC` and others that are 
+planned to be implemented to access `daemons` using other methods, such as REST API.
 
-`Service` contains the most important abstract method `call` for calling a service 
-with given parameters. It's the base class to `ServiceByGRPC` and others that are 
-planned to be implemented to access `daemons` using other protocols, such as REST API.
+##### data
+
+- organization id
+- service id
+- payment group
+- service metadata
+- payment strategy
+- `Account`'s instance (it's got from the owner's entity `SNETEngine`)
+- `Channels`'s instance (it's got from the owner's entity `SNETEngine`)
+- `MPEContract`'s instance (it's got from the owner's entity `SNETEngine`)
+- `RegistryContract`'s instance (it's got from the owner's entity `SNETEngine`)
+- an instance of the metadata provider implementation (it's got from the owner's entity `SNETEngine`)
+- an instance of a Web3 library entity (it's got from the owner's entity `SNETEngine`)
 
 ##### functionality
 
 - call a service with given parameters (abstract)
+- providing the user with access to `MPEContract`'s instance functionality related on channels
+- providing the user with access to `RegistryContract`'s instance functionality related on services
+- providing the user with access to metadata provider functionality related on service metadata
 
 ---
 
-needs to be rewritten
+#### ServiceClientByGRPC
 
-#### ServiceByGRPC
-
-`ServiceByGRPC` extends `Service`. It allows you to call service functions by 
+`ServiceClientByGRPC` extends `ServiceClient`. It allows you to call service functions by 
 communicating with the `daemon` via gRPC
 
 ##### data
 
-- 
+- grpc channel
+- data needed for grpc call
+- protobuf modules
 
 ##### functionality
 
+<!--TODO: understand the remaining functionality related on grpc and finish writing it-->
+
+- implementation of a service call with given parameters via gRPC
 - 
 
 ---
@@ -213,6 +235,7 @@ transactions for calling _write_ functions of smart contracts in Ethereum. `EthC
   - processing transaction result
 - getting and increasing gas price to efficiently execute a transaction on the blockchain using the following 
 algorithm (in Python) 
+
 ```python
 def _get_gas_price(self):
     gas_price = self.w3.eth.gas_price
@@ -284,21 +307,25 @@ to be implemented to work with other external file storages on the SNET platform
 - publishing organization metadata in external storage (abstract)
 - publishing service metadata in external storage (abstract)
 - publishing `.proto` in from external storage (abstract)
-- updating service metadata (abstract)
 
 ---
 
 #### IPFSMetadataProvider
 
-
+`IPFSMetadataProvider` implements `MetadataProvider`. It allows you to work with metadata and `.proto` files using
+[Interplanetary Filesystem (IPFS)](https://ipfs.tech/).
 
 ##### data
 
-- 
+- `RegistryContract`'s instance (it's got from the owner's entity `SNETEngine`)
+- an instance of a IPFS HTTP client entity from the corresponding library
+- directory for storage protobuf files
 
 ##### functionality
 
-- 
+<!--TODO: finish writing the remaining functionality related-->
+- implementation... 
+- conversion...
 
 ---
 
