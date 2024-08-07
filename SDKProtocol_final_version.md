@@ -35,7 +35,7 @@ required for the operation of the functional level.
   3. [ServiceByGRPC](#servicebygrpc)
 - [Functional Layer](#functional-layer)
   1. [Contract](#contract)
-  2. [EthContract]()
+  2. [EthContract](#ethcontract)
   3. [MPEContract]()
   4. [RegistryContract]()
   5. [MetadataProvider]()
@@ -63,8 +63,7 @@ required for the operation of the functional level.
 
 #### Account
 
-`Account` is an abstract entity. It contains abstract functions, such as `get_name`
-and `get_nonce`. It's the base class to `EthAccount` and others that are planned to be implemented to work 
+`Account` is an abstract entity. It's the base class to `EthAccount` and others that are planned to be implemented to work 
 with other blockchains on the SNET platform.
 
 ---
@@ -149,6 +148,8 @@ from `SNETEngine`.
 
 ---
 
+needs to be rewritten
+
 #### Service
 
 `Service` contains the most important abstract method `call` for calling a service 
@@ -161,6 +162,8 @@ planned to be implemented to access `daemons` using other protocols, such as RES
 
 ---
 
+needs to be rewritten
+
 #### ServiceByGRPC
 
 `ServiceByGRPC` extends `Service`. It allows you to call service functions by 
@@ -168,7 +171,7 @@ communicating with the `daemon` via gRPC
 
 ##### data
 
--
+- 
 
 ##### functionality
 
@@ -189,7 +192,105 @@ to be implemented to work with other blockchains on the SNET platform.
 #### EthContract
 
 `EthContract` implements `Contract`. It allows you to call _read_ functions and perform
-transactions for calling _write_ functions of smart contracts in Ethereum.
+transactions for calling _write_ functions of smart contracts in Ethereum. `EthContract` is the base entity for 
+`MPEContract`, `RegistryContract` and `AGIXContract`.
+
+##### data
+
+- an instance of a Web3 library entity (it's got from the owner's entity `SNETEngine`)
+- smart contract object from Web3 library
+- contract address
+
+##### functionality
+
+- getting Web3 library contract object by name and optionally address  (using `snet.contracts` library)
+- getting contract info from Web3 library contract object
+- calling contract _read_ functions by name and parameters
+- calling contract _write_ functions by name and parameters and execution of the entire transaction pipeline:
+  - building transaction
+  - signing transaction (using `TransactionHandler`)
+  - sending transaction (using `TransactionHandler`)
+  - processing transaction result
+- getting and increasing gas price to efficiently execute a transaction on the blockchain using the following 
+algorithm (in Python) 
+```python
+def _get_gas_price(self):
+    gas_price = self.w3.eth.gas_price
+    if gas_price <= 15000000000:
+        gas_price += gas_price * 1 / 3
+    elif 15000000000 < gas_price <= 50000000000:
+        gas_price += gas_price * 1 / 5
+    elif 50000000000 < gas_price <= 150000000000:
+        gas_price += 7000000000
+    elif gas_price > 150000000000:
+        gas_price += gas_price * 1 / 10
+    return int(gas_price)
+```
+
+---
+
+#### MPEContract
+
+`MPEContract` extends `EthContract`. It's an entity that provides all the functionality from 
+[MultyPartyEscrow Contract](https://sepolia.etherscan.io/address/0x7e0af8988df45b824b2e0e0a87c6196897744970).
+
+##### data
+
+- `AGIXContract`'s instance (it's got from the owner's entity `SNETEngine`)
+
+##### functionality
+
+- calling [_read_ functions](https://sepolia.etherscan.io/address/0x7e0af8988df45b824b2e0e0a87c6196897744970#readContract):
+  - balance
+  - channels
+- calling [_write_ functions](https://sepolia.etherscan.io/address/0x7e0af8988df45b824b2e0e0a87c6196897744970#writeContract):
+  - deposit
+  - openChannel
+  - channelExtendAndAddFunds
+  - etc.
+- Using `AGIXContract`'s _approve_ function in functions where it is needed
+
+---
+
+#### RegistryContract
+
+`RegistryContract` extends `EthContract`. It's an entity that provides all the functionality from 
+[Registry Contract](https://sepolia.etherscan.io/address/0x4DCc70c6FCE4064803f0ae0cE48497B3f7182e5D).
+
+##### functionality
+
+- calling [_read_ functions](https://sepolia.etherscan.io/address/0x4DCc70c6FCE4064803f0ae0cE48497B3f7182e5D#readContract):
+  - getOrganizationById
+  - getServiceRegistrationById
+  - etc.
+- calling [_write_ functions](https://sepolia.etherscan.io/address/0x4DCc70c6FCE4064803f0ae0cE48497B3f7182e5D#writeContract):
+  - createOrganization
+  - updateServiceRegistration
+  - etc.
+
+---
+
+#### MetadataProvider
+
+`MetadataProvider` is an abstract entity. It allows you to keep (save and get) organization and service metadata 
+(and by the way also `.proto` files). It's the base class to `IPFSMetadataProvider` and others that are planned 
+to be implemented to work with other external file storages on the SNET platform.
+
+##### functionality
+
+- getting organization metadata from external storage (abstract)
+- getting service metadata from external storage (abstract)
+- getting `.proto` files from external storage (abstract)
+- publishing organization metadata in external storage (abstract)
+- publishing service metadata in external storage (abstract)
+- publishing `.proto` in from external storage (abstract)
+- updating service metadata (abstract)
+
+---
+
+#### IPFSMetadataProvider
+
+
 
 ##### data
 
@@ -200,3 +301,4 @@ transactions for calling _write_ functions of smart contracts in Ethereum.
 - 
 
 ---
+
