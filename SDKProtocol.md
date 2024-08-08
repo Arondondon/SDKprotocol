@@ -47,15 +47,14 @@ required for the operation of the functional level.
   2. [AGIXContract](#agixcontract)
   3. [ServiceMetadata](#servicemetadata)
   4. [OrgMetadata](#orgmetadata)
-  5. [IPFSUtils]()
-  6. [TransactionHandler]()
-  7. [LedgerTransactionHandler]()
-  8. [KeyOrMnemonicTransactionHandler]()
-  9. [PaymentStrategy]()
-  10. [DefaultPaymentStrategy]()
-  11. [FreeCallPaymentStrategy]()
-  12. [PrepaidPaymentStrategy]()
-  13. [PaidCallPaymentStrategy]()
+  5. [TransactionHandler](#transactionhandler)
+  6. [LedgerTransactionHandler](#ledgertransactionhandler)
+  7. [KeyOrMnemonicTransactionHandler](#keyormnemonictransactionhandler)
+  8. [PaymentStrategy]()
+  9. [DefaultPaymentStrategy]()
+  10. [FreeCallPaymentStrategy]()
+  11. [PrepaidPaymentStrategy]()
+  12. [PaidCallPaymentStrategy]()
 
 ---
 
@@ -255,7 +254,7 @@ def _get_gas_price(self):
 #### MPEContract
 
 `MPEContract` extends `EthContract`. It's an entity that provides all the functionality from 
-[MultyPartyEscrow Contract](https://sepolia.etherscan.io/address/0x7e0af8988df45b824b2e0e0a87c6196897744970).
+[MultyPartyEscrow Contract](https://etherscan.io/address/0x5e592F9b1d303183d963635f895f0f0C48284f4e).
 
 ##### data
 
@@ -263,30 +262,30 @@ def _get_gas_price(self):
 
 ##### functionality
 
-- calling [_read_ functions](https://sepolia.etherscan.io/address/0x7e0af8988df45b824b2e0e0a87c6196897744970#readContract):
+- calling [_read_ functions](https://etherscan.io/address/0x5e592F9b1d303183d963635f895f0f0C48284f4e#readContract):
   - balance
   - channels
-- calling [_write_ functions](https://sepolia.etherscan.io/address/0x7e0af8988df45b824b2e0e0a87c6196897744970#writeContract):
+- calling [_write_ functions](https://etherscan.io/address/0x5e592F9b1d303183d963635f895f0f0C48284f4e#writeContract):
   - deposit
   - openChannel
   - channelExtendAndAddFunds
   - etc.
-- Using `AGIXContract`'s _approve_ function in functions where it is needed
+- Using `AGIXContract` in functions where it is needed
 
 ---
 
 #### RegistryContract
 
 `RegistryContract` extends `EthContract`. It's an entity that provides all the functionality from 
-[Registry Contract](https://sepolia.etherscan.io/address/0x4DCc70c6FCE4064803f0ae0cE48497B3f7182e5D).
+[Registry Contract](https://etherscan.io/address/0x247DEbEBB766E4fA99667265A158060018D5f4F8).
 
 ##### functionality
 
-- calling [_read_ functions](https://sepolia.etherscan.io/address/0x4DCc70c6FCE4064803f0ae0cE48497B3f7182e5D#readContract):
+- calling [_read_ functions](https://etherscan.io/address/0x247DEbEBB766E4fA99667265A158060018D5f4F8#readContract):
   - getOrganizationById
   - getServiceRegistrationById
   - etc.
-- calling [_write_ functions](https://sepolia.etherscan.io/address/0x4DCc70c6FCE4064803f0ae0cE48497B3f7182e5D#writeContract):
+- calling [_write_ functions](https://etherscan.io/address/0x247DEbEBB766E4fA99667265A158060018D5f4F8#writeContract):
   - createOrganization
   - updateServiceRegistration
   - etc.
@@ -399,43 +398,204 @@ them effectively.
 
 #### AGIXContract
 
-
-
-##### data
-
--
+`AGIXContract` extends `EthContract`. It's an entity that provides the functionality from 
+[SingularityNET AGIX Token Contract](https://etherscan.io/address/0x5B7533812759B45C2B44C19e320ba2cD2681b542).
 
 ##### functionality
 
--
+- - calling [_read_ functions](https://etherscan.io/address/0x5B7533812759B45C2B44C19e320ba2cD2681b542#readContract):
+  - allowance
+  - balanceOf
+  - etc.
+- - calling [_write_ functions](https://etherscan.io/address/0x5B7533812759B45C2B44C19e320ba2cD2681b542#writeContract):
+  - approve
+  - transfer
+  - etc.
 
 ---
 
 #### ServiceMetadata
 
+`ServiceMetadata` is an entity for manipulating service metadata. It is possible that there may 
+be other entities inside for complex metadata fields. Below is an example of service metadata.
 
+```json
+{
+    "version": 1,
+    "display_name": "Example service",
+    "encoding": "proto",
+    "service_type": "grpc",
+    "model_ipfs_hash": "QmeyrQkEyba8dd4rc3jrLd5pEwsxHutfH2RvsSaeSMqTtQ",
+    "mpe_address": "0x7E0aF8988DF45B824b2E0e0A87c6196897744970",
+    "groups": [
+        {
+            "free_calls": 0,
+            "free_call_signer_address": "0x7DF35C98f41F3Af0df1dc4c7F7D4C19a71Dd059F",
+            "daemon_addresses": [
+                "0x0709e9b78756b740ab0c64427f43f8305fd6d1a7"
+            ],
+            "pricing": [
+                {
+                    "default": true,
+                    "price_model": "fixed_price",
+                    "price_in_cogs": 1
+                }
+            ],
+            "endpoints": [
+                "http://node1.naint.tech:62400"
+            ],
+            "group_id": "/mb90Qs8VktxGQmU0uRu0bSlGgqeDlYrKrs+WbsOvOQ=",
+            "group_name": "default_group"
+        }
+    ],
+    "service_description": {
+        "url": "https://ropsten-v2-publisher.singularitynet.io/org",
+        "short_description": "Example service",
+        "description": "Example service"
+    },
+    "media": [
+        {
+            "order": 1,
+            "url": "https://ropsten-marketplace-service-assets.s3.us-east-1.amazonaws.com/26072b8b6a0e448180f8c0e702ab6d2f/services/d05c62bf9aa84843a195457d98417f4e/assets/20240327124952_asset.jpeg",
+            "file_type": "image",
+            "asset_type": "hero_image",
+            "alt_text": ""
+        }
+    ],
+    "contributors": [
+        {
+            "name": "test",
+            "email_id": ""
+        }
+    ],
+    "tags": [
+        "exampleservice"
+    ]
+}
+```
 
 ##### data
 
-- 
+- map (or just fields) with service data
 
 ##### functionality
 
--
+- updating fields value
+- adding new data to fields that are lists (media, groups, etc.)
+- removing data from fields that are lists (media, groups, etc.)
+- converting from `json` and back
 
 ---
 
 #### OrgMetadata
 
+`ServiceMetadata` is an entity for manipulating organization metadata. It is possible that there may 
+be other entities inside for complex metadata fields. Below is an example of organization metadata.
 
+```json
+{
+    "org_name": "Snet_test",
+    "org_id": "26072b8b6a0e448180f8c0e702ab6d2f",
+    "org_type": "individual",
+    "description": {
+        "description": "Snet_test",
+        "short_description": "Snet_test",
+        "url": "https://ropsten-v2-publisher.singularitynet.io"
+    },
+    "assets": {
+        "hero_image": "QmfTjcwBYwWCp5hdC5E3DRyHBFafaCVHDs1cCammDYkQPE/20240327124724_asset.jpeg"
+    },
+    "contacts": [
+        {
+            "email": "",
+            "phone": "+18005551234",
+            "contact_type": "general"
+        },
+        {
+            "email": "test@gmail.com",
+            "phone": "+18005551234",
+            "contact_type": "support"
+        }
+    ],
+    "groups": [
+        {
+            "group_name": "default_group",
+            "group_id": "/mb90Qs8VktxGQmU0uRu0bSlGgqeDlYrKrs+WbsOvOQ=",
+            "payment": {
+                "payment_address": "0x0709e9B78756B740ab0C64427f43f8305fD6D1A7",
+                "payment_expiration_threshold": 40320,
+                "payment_channel_storage_type": "etcd",
+                "payment_channel_storage_client": {
+                    "connection_timeout": "5s",
+                    "request_timeout": "3s",
+                    "endpoints": [
+                        "https://127.0.0.1:2379"
+                    ]
+                }
+            }
+        }
+    ]
+}
+```
 
 ##### data
 
-- 
+- map (or just fields) with organization data
 
 ##### functionality
 
-- 
+- updating fields value
+- adding new data to fields that are lists (groups, contacts, etc.)
+- removing data from fields that are lists (groups, contacts, etc.)
+- converting from `json` and back
+
+---
+
+#### TransactionHandler
+
+`TransactionHandler` is an abstract entity. It allows you to conduct transactions. `TransactionHandler` 
+is the base class to `LedgerTransactionHandler` and `KeyOrMnemonicTransactionHandler`.
+
+##### functionality
+
+- signing transaction
+- sending transaction
+- getting wallet address
+- signing message
+
+---
+
+#### LedgerTransactionHandler
+
+`LedgerTransactionHandler` implements `TransactionHandler`. It allows you to conduct transactions 
+using ledger. 
+
+##### data
+
+- address
+- index
+- dongle path
+
+##### functionality
+
+- connecting to ledger
+<!-- TODO: find out what exactly is happening to connect with the ledger -->
+
+---
+
+#### KeyOrMnemonicTransactionHandler
+
+`KeyOrMnemonicTransactionHandler` implements `TransactionHandler`. It allows you to conduct transactions 
+using key or mnemonic with index. 
+
+##### data
+
+- private key
+- address
+
+##### functionality
+
+- implementation parent's functionality using Web3
 
 ---
 
