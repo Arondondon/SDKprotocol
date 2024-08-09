@@ -7,7 +7,7 @@ regardless of the implementation language.
 
 - [SDK structure](#structure)
 - [Entities description](#entities)
-- [User story]()
+- [User story](#user-story)
 
 ## Structure
 
@@ -50,11 +50,13 @@ required for the operation of the functional level.
   5. [TransactionHandler](#transactionhandler)
   6. [LedgerTransactionHandler](#ledgertransactionhandler)
   7. [KeyOrMnemonicTransactionHandler](#keyormnemonictransactionhandler)
-  8. [PaymentStrategy]()
-  9. [DefaultPaymentStrategy]()
-  10. [FreeCallPaymentStrategy]()
-  11. [PrepaidPaymentStrategy]()
-  12. [PaidCallPaymentStrategy]()
+  8. [PaymentStrategy](#paymentstrategy)
+  9. [DefaultPaymentStrategy](#defaultpaymentstrategy)
+  10. [FreeCallPaymentStrategy](#freecallpaymentstrategy)
+  11. [PrepaidPaymentStrategy](#prepaidpaymentstrategy)
+  12. [PaidCallPaymentStrategy](#paidcallpaymentstrategy)
+  13. [ConcurrencyManager](#concurrencymanager)
+  14. [Utils](#utils)
 
 ---
 
@@ -62,7 +64,7 @@ required for the operation of the functional level.
 
 #### Account
 
-`Account` is an abstract entity. It's the base class to `EthAccount` and others that are planned to be 
+`Account` is an abstract entity. It's the base entity to `EthAccount` and others that are planned to be 
 implemented to work with other blockchains on the SNET platform.
 
 ---
@@ -154,7 +156,7 @@ from `SNETEngine`.
 
 `Service` is an entity that allows an account to call a service and also call contracts and 
 metadata provider functionality related on service. It contains the most important abstract method 
-`call` for calling a service with given parameters. It's the base class to `ServiceClientByGRPC` and 
+`call` for calling a service with given parameters. It's the base entity to `ServiceClientByGRPC` and 
 others that are planned to be implemented to access `daemons` using other methods, such as REST API.
 
 ##### data
@@ -177,6 +179,7 @@ others that are planned to be implemented to access `daemons` using other method
 - providing the user with access to `MPEContract`'s instance functionality related on channels
 - providing the user with access to `RegistryContract`'s instance functionality related on services
 - providing the user with access to metadata provider functionality related on service metadata
+- getting service information
 
 ---
 
@@ -205,7 +208,7 @@ communicating with the `daemon` via gRPC
 #### Contract
 
 `Contract` is an abstract entity. It contains abstract methods to call _read_ and 
-_write_ functions of smart contracts. It's the base class to `EthContract` and others that are planned 
+_write_ functions of smart contracts. It's the base entity to `EthContract` and others that are planned 
 to be implemented to work with other blockchains on the SNET platform.
 
 ---
@@ -295,7 +298,7 @@ def _get_gas_price(self):
 #### MetadataProvider
 
 `MetadataProvider` is an abstract entity. It allows you to keep (save and get) organization and 
-service metadata (and by the way also `.proto` files). It's the base class to `IPFSMetadataProvider` 
+service metadata (and by the way also `.proto` files). It's the base entity to `IPFSMetadataProvider` 
 and others that are planned to be implemented to work with other external file storages on 
 the SNET platform.
 
@@ -554,7 +557,7 @@ be other entities inside for complex metadata fields. Below is an example of org
 #### TransactionHandler
 
 `TransactionHandler` is an abstract entity. It allows you to conduct transactions. `TransactionHandler` 
-is the base class to `LedgerTransactionHandler` and `KeyOrMnemonicTransactionHandler`.
+is the base entity to `LedgerTransactionHandler` and `KeyOrMnemonicTransactionHandler`.
 
 ##### functionality
 
@@ -598,4 +601,117 @@ using key or mnemonic with index.
 - implementation parent's functionality using Web3
 
 ---
+
+#### PaymentStrategy
+
+`PaymentStrategy` is an abstract entity. It's needed for execution of various types of payments. `PaymentStrategy` 
+is the base entity to `DefaultPaymentStrategy`, `FreeCallPaymentStrategy`, `FreeCallPaymentStrategy` 
+and `PaidCallPaymentStrategy`.
+
+##### functionality
+
+- getting call price (abstract)
+- getting payment metadata (abstract)
+
+---
+
+#### DefaultPaymentStrategy
+
+`DefaultPaymentStrategy` implements `PaymentStrategy`. This payment strategy is used by default when 
+the user does not specify which strategy to use. And in fact, this is not a separate strategy, this entity, 
+depending on various conditions, chooses strategy from `FreeCallPaymentStrategy`, `FreeCallPaymentStrategy` 
+and `PaidCallPaymentStrategy`.
+
+##### data
+
+- `ConcurrencyManager`'s instance
+- channel
+
+##### functionality
+
+- choosing payment strategy
+
+---
+
+#### FreeCallPaymentStrategy
+
+`FreeCallPaymentStrategy` implements `PaymentStrategy`. This payment strategy can be used when the user 
+has free service call tokens.
+
+##### functionality
+
+- checking for free call tokens
+- implementation of parent's functionality for free-call type of call
+
+---
+
+#### PrepaidPaymentStrategy
+
+`PrepaidPaymentStrategy` implements `PaymentStrategy`. This strategy can be used when the user has deposited 
+funds into the channel in advance and **wants to pay for several calls at once**.
+
+##### data
+
+- `ConcurrencyManager`'s instance (it's got from the owner's entity, usually from`DefaultPaymentStrategy`)
+- call allowance
+- block offset (240 by default)
+
+##### functionality
+
+- providing concurrency
+- implementation of parent's functionality for prepaid type of call
+- selecting channel with checking for its presence, amount and expiration
+
+---
+
+#### PaidCallPaymentStrategy
+
+`FreeCallPaymentStrategy` implements `PaymentStrategy`. This payment strategy can be used when the user 
+wants to call the service once. 
+
+##### data
+
+- call allowance
+- block offset (240 by default)
+
+##### functionality
+
+- implementation of parent's functionality 
+- selecting channel with checking for its presence, amount and expiration
+
+---
+
+#### ConcurrencyManager
+
+`ConcurrencyManager` is an entity that organizes and controls concurrency by turning to the daemon.
+
+##### data
+
+- amount of concurrent calls
+- token
+- planned and used amount
+
+##### functionality
+
+- working with channel
+- getting token from daemon
+- control of planned and used funds
+
+---
+
+#### Utils
+
+`Utils` is an entity that contains a set of functions used in many other entities. 
+
+##### functionality
+
+- validation of URL
+- validation of endpoint
+- getting address from private key and mnemonic
+- getting data from abi
+- etc.
+
+---
+
+## User Story
 
