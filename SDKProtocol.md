@@ -715,3 +715,5 @@ wants to call the service once.
 
 ## User Story
 
+![pu pu pu](resources/UseCase.png)
+
