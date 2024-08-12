@@ -715,5 +715,41 @@ wants to call the service once.
 
 ## User Story
 
+This is a general scenario for an SDK user.
+
+#### Preparatory actions
+
+1. creating a `Config`'s instance with the required values
+2. creating a `SNETEngine`'s instance with the config passed to it
+3. adding new account (wallet) (`Account`) to the engine by calling `SNETEngine`'s method 
+(not necessary, but most likely will be needed)  
+4. creating new `ServiceClient`'s instance by calling `SNETEngine`'s method 
+(not necessary, but most likely will be needed).
+
+Now the SDK functionality is available through instances of the entities `SNETEngine` 
+and `ServiceClient`.
+
+#### ServiceClient functionality
+
+1. ServiceClient → call
+2. ServiceClient → PaymentChannel → functions of the MPE contract for the channel 
+(e.g. `add funds`, `extend expiraton`)
+3. ServiceClient → ServiceMetadata → functions for editing service metadata, as well as 
+for publishing metadata to metadata provider, and downloading metadata from it
+
+#### SNETEngine functionality
+
+1. SNETEngine → Channels → functions of the MPE contract for the set of channels 
+(e.g. `open channel`, `load channels`)
+2. SNETEngine → MPEContract → functions of the MPE contract for the account 
+(e.g. `claim`, `deposit`) (in fact, MPEContract contains all the functionality of MPE, 
+but access to other functions is more convenient in other ways (through other entities))
+3. SNETEngine → RegistryContract → functions of the Registry contract for 
+services and organizations
+4. SNETEngine → MetadataProvider → OrgMetadata → functions for editing organization metadata, 
+as well as for publishing metadata to metadata provider, and downloading metadata from it
+
+> Warning: here, the names of entities do not refer to the entities themselves, but to their instances!
+
 ![pu pu pu](resources/UseCase.png)
 
