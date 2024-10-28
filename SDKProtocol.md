@@ -5,9 +5,50 @@ regardless of the implementation language.
 
 ## Contents
 
-- [SDK structure](#structure)
-- [Entities description](#entities)
 - [User story](#user-story)
+- [Structure](#structure)
+- [Entities](#entities)
+- [Interfaces](#interfaces)
+
+## User Story
+
+This is a general scenario for an SDK user.
+
+#### Preparatory actions
+
+1. creating a `Config`'s instance with the required values
+2. creating a `SNETEngine`'s instance with the config passed to it
+3. adding new account (wallet) (`Account`) to the engine by calling `SNETEngine`'s method 
+(not necessary, but most likely will be needed)  
+4. creating new `ServiceClient`'s instance by calling `SNETEngine`'s method 
+(not necessary, but most likely will be needed).
+
+Now the SDK functionality is available through instances of the entities `SNETEngine` 
+and `ServiceClient`.
+
+#### ServiceClient functionality
+
+1. ServiceClient → call
+2. ServiceClient → PaymentChannel → functions of the MPE contract for the channel 
+(e.g. `add funds`, `extend expiraton`)
+3. ServiceClient → ServiceMetadata → functions for editing service metadata, as well as 
+for publishing metadata to metadata provider, and downloading metadata from it
+
+#### SNETEngine functionality
+
+1. SNETEngine → Channels → functions of the MPE contract for the set of channels 
+(e.g. `open channel`, `load channels`)
+2. SNETEngine → MPEContract → functions of the MPE contract for the account 
+(e.g. `claim`, `deposit`) (in fact, MPEContract contains all the functionality of MPE, 
+but access to other functions is more convenient in other ways (through other entities))
+3. SNETEngine → RegistryContract → functions of the Registry contract for 
+services and organizations
+4. SNETEngine → MetadataProvider → OrgMetadata → functions for editing organization metadata, 
+as well as for publishing metadata to metadata provider, and downloading metadata from it
+
+> Warning: here, the names of entities do not refer to the entities themselves, but to their instances!
+
+![pu pu pu](resources/UseCase.png)
 
 ## Structure
 
@@ -713,43 +754,111 @@ wants to call the service once.
 
 ---
 
-## User Story
+## Interfaces
 
-This is a general scenario for an SDK user.
+- [Smart Contracts](#smart-contracts)
+- [Storage Providers](#storage-providers)
+- [Daemon](#daemon)
 
-#### Preparatory actions
+### Smart Contracts
 
-1. creating a `Config`'s instance with the required values
-2. creating a `SNETEngine`'s instance with the config passed to it
-3. adding new account (wallet) (`Account`) to the engine by calling `SNETEngine`'s method 
-(not necessary, but most likely will be needed)  
-4. creating new `ServiceClient`'s instance by calling `SNETEngine`'s method 
-(not necessary, but most likely will be needed).
+#### MultiPartyEscrow
 
-Now the SDK functionality is available through instances of the entities `SNETEngine` 
-and `ServiceClient`.
+Here are the functions of this contract that the SDK must be able to call
 
-#### ServiceClient functionality
+1. `balances`
 
-1. ServiceClient → call
-2. ServiceClient → PaymentChannel → functions of the MPE contract for the channel 
-(e.g. `add funds`, `extend expiraton`)
-3. ServiceClient → ServiceMetadata → functions for editing service metadata, as well as 
-for publishing metadata to metadata provider, and downloading metadata from it
+Returns balance of an address from MPE
 
-#### SNETEngine functionality
+###### arguments:
 
-1. SNETEngine → Channels → functions of the MPE contract for the set of channels 
-(e.g. `open channel`, `load channels`)
-2. SNETEngine → MPEContract → functions of the MPE contract for the account 
-(e.g. `claim`, `deposit`) (in fact, MPEContract contains all the functionality of MPE, 
-but access to other functions is more convenient in other ways (through other entities))
-3. SNETEngine → RegistryContract → functions of the Registry contract for 
-services and organizations
-4. SNETEngine → MetadataProvider → OrgMetadata → functions for editing organization metadata, 
-as well as for publishing metadata to metadata provider, and downloading metadata from it
+- address
 
-> Warning: here, the names of entities do not refer to the entities themselves, but to their instances!
+###### returns:
 
-![pu pu pu](resources/UseCase.png)
+- balance
 
+2. `channels`
+
+Returns channel state from MPE
+
+###### arguments:
+
+- channel_id
+
+###### returns:
+
+- nonce
+- sender
+- signer
+- recipient
+- group identifier
+- amount
+- expiration
+
+3. `openChannel`
+4. `channelAddFunds`
+5. `channelExtend`
+6. `channelExtendAndAddFunds`
+7. `deposit`
+8. `depositAndOpenChannel`
+8. `withdraw`
+9. `channelClaim`
+10. `multiChannelClaim`
+11. `channelClaimTimeout`
+
+#### Registry
+
+Here are the functions of this contract that the SDK must be able to call
+
+1. `getOrganizationById`
+2. `getServiceRegistrationById`
+3. `listOrganizations`
+4. `listServicesForOrganization`
+5. `createOrganization`
+6. `deleteOrganization`
+7. `createServiceRegistration`
+8. `deleteServiceRegistration`
+9. `updateServiceRegistration`
+10. `addOrganizationMembers`
+11. `removeOrganizationMembers`
+12. `changeOrganizationMetadataURI`
+13. `changeOrganizationOwner`
+
+#### SingularityNetToken
+
+Here are the functions of this contract that the SDK must be able to call
+
+1. `balanceOf`
+2. `allowance`
+3. `approve`
+
+### Storage Providers
+
+The storage provider is designed to store metadata of services and organizations, as well as services (daemons) APIs. 
+Organization and service metadata URI are stored in Registry. Service API source (URI) is stored in service metadata 
+in the field `service_api_source`. 
+
+URI is a string consisting of a prefix with the name of the storage and the identifier of the file in that storage
+`<STORAGE_NAME>://<FILE_IDENTIFIER>`. The organization and service metadata URIs stored in the registry are 
+additionally encoded in ASCII format and padded with null bytes.
+
+#### IPFS
+
+URI example: `ipfs://<IPFS_HASH>`
+
+#### FileCoin
+
+URI example: `filecoin://<FILECOIN_CID>`
+
+### Daemon
+
+Interaction with the daemon is currently carried out only using gRPC. To call the service, you need to get the 
+service API (.proto files) from the storage provider, compile them and call any of the described methods via gRPC.
+In addition, the daemon has methods that are the same for everyone. Therefore, the SDK stores .proto files for 
+the following services, which are the same for all daemons:
+
+- `state_service` - needed to determine the current state of the channel
+- `control_service` - needed to change the configuration of the daemon
+- `token_service` - needed for concurrency implementation
+- `training` - needed to work with AI models
