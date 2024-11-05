@@ -762,40 +762,18 @@ wants to call the service once.
 
 ### Smart Contracts
 
+Payment for service calls on the Singularity NET platform is made using the Singularity NET Token (AGIX) through 
+a payment channel. To realize a service call on the platform, there are smart contracts. Each of them is responsible 
+for a specific functionality.
+
 #### MultiPartyEscrow
+
+The main purpose of MPE is to manage payment channels. 
 
 Here are the functions of this contract that the SDK must be able to call
 
 1. `balances`
-
-Returns balance of an address from MPE
-
-###### arguments:
-
-- address
-
-###### returns:
-
-- balance
-
 2. `channels`
-
-Returns channel state from MPE
-
-###### arguments:
-
-- channel_id
-
-###### returns:
-
-- nonce
-- sender
-- signer
-- recipient
-- group identifier
-- amount
-- expiration
-
 3. `openChannel`
 4. `channelAddFunds`
 5. `channelExtend`
