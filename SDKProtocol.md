@@ -240,7 +240,6 @@ communicating with the `daemon` via gRPC
 <!--TODO: understand the remaining functionality related on grpc and finish writing it-->
 
 - implementation of a service call with given parameters via gRPC
-- 
 
 ---
 
@@ -768,48 +767,62 @@ for a specific functionality.
 
 #### MultiPartyEscrow
 
-The main purpose of MPE is to manage payment channels. 
+The main purpose of MPE is to manage payment channels. For a call to be successful, a suitable payment channel 
+must be open, it must have sufficient funds and it must not be overdue. MPE is needed to manage this and 
+monitor the channels.
 
 Here are the functions of this contract that the SDK must be able to call
 
-1. `balances`
-2. `channels`
-3. `openChannel`
-4. `channelAddFunds`
-5. `channelExtend`
-6. `channelExtendAndAddFunds`
-7. `deposit`
-8. `depositAndOpenChannel`
-8. `withdraw`
-9. `channelClaim`
-10. `multiChannelClaim`
-11. `channelClaimTimeout`
+1. `balances` - returns MPE balance
+2. `channels` - returns the channel's state
+3. `openChannel` - opens a new channel with a given amount of funds and expiration
+4. `channelAddFunds` - adds funds to the channel
+5. `channelExtend` - extends the expiration of the channel
+6. `channelExtendAndAddFunds` - extends the expiration of the channel and adds funds
+7. `deposit` - deposits funds into the MPE
+8. `depositAndOpenChannel` - deposits funds into the MPE and opens a new channel with the same amount of funds and 
+a given expiration
+8. `withdraw` - withdraws funds from the MPE back to the wallet
+9. `channelClaim` - claims funds from the channel (**for the service providers**)
+10. `multiChannelClaim` - claims funds from multiple channels (**for the service providers**)
+11. `channelClaimTimeout` - claims funds from the channel if the channel has expired (**for the service consumers**)
+
+You can see the implementation of MultiPartyEscrow in Ethereum [here](https://etherscan.io/address/0x5e592F9b1d303183d963635f895f0f0C48284f4e).
 
 #### Registry
 
+Registry is designed to manage data about organizations and services, as well as their metadata. With its help 
+you can register an organization and a service, as well as get URI to their metadata in storage providers (and from 
+the service metadata you can get a URI to the service API).
+
 Here are the functions of this contract that the SDK must be able to call
 
-1. `getOrganizationById`
-2. `getServiceRegistrationById`
-3. `listOrganizations`
-4. `listServicesForOrganization`
-5. `createOrganization`
-6. `deleteOrganization`
-7. `createServiceRegistration`
-8. `deleteServiceRegistration`
-9. `updateServiceRegistration`
-10. `addOrganizationMembers`
-11. `removeOrganizationMembers`
-12. `changeOrganizationMetadataURI`
-13. `changeOrganizationOwner`
+1. `getOrganizationById` - returns organization data
+2. `getServiceRegistrationById` - returns service URI
+3. `listOrganizations` - returns list of organization IDs
+4. `listServicesForOrganization` - returns list of service IDs for an organization
+5. `createOrganization` - creates an organization
+6. `deleteOrganization` - deletes an organization
+7. `createServiceRegistration` - creates a service
+8. `deleteServiceRegistration` - deletes a service
+9. `updateServiceRegistration` - updates service metadata URI
+10. `addOrganizationMembers` - adds members to the organization
+11. `removeOrganizationMembers` - removes members from the organization
+12. `changeOrganizationMetadataURI` - changes organization metadata URI
+13. `changeOrganizationOwner` - changes organization owner
+
+You can see the implementation of Registry in Ethereum [here](https://etherscan.io/address/0x247DEbEBB766E4fA99667265A158060018D5f4F8).
 
 #### SingularityNetToken
 
+The AGIX Token is an ERC-20 token that powers the SingularityNet platform. In the SDK, this contract is needed to 
+check the balance and deposit funds into the MPE
+
 Here are the functions of this contract that the SDK must be able to call
 
-1. `balanceOf`
-2. `allowance`
-3. `approve`
+1. `balanceOf` - returns balance of the wallet
+2. `allowance` - returns the allowance for spending
+3. `approve` - approves a spender (particularly MPE) to take a certain amount of your funds
 
 ### Storage Providers
 
