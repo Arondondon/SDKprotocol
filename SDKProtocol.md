@@ -1,16 +1,22 @@
 # SNET SDK protocol
 
-SDK protocol describes the structure, entities and their functionality for the SDK 
+SingularityNET Platform SDK goals to provide a convenient programming interface for the application developers
+who want to use variety of AI models in their applications or even provide this capability to their users.
+
+SDK protocol describes the structure, entities and functionality for the SingularityNET Platform SDK 
 regardless of the implementation language.
+
+Specific implementation of the SingularityNET Platform SDK may differ in its internal structure and entities
+but must maintain compatibility of all SDK interfaces with corresponding essential platform components.
 
 ## Contents
 
-- [User story](#user-story)
+- [User flow](#user-flow)
 - [Structure](#structure)
 - [Entities](#entities)
 - [Interfaces](#interfaces)
 
-## User Story
+## User Flow
 
 This is a general scenario for an SDK user.
 
@@ -46,7 +52,7 @@ services and organizations
 4. SNETEngine → MetadataProvider → OrgMetadata → functions for editing organization metadata, 
 as well as for publishing metadata to metadata provider, and downloading metadata from it
 
-> Warning: here, the names of entities do not refer to the entities themselves, but to their instances!
+> Note: On the following diagram the names of entities do not refer to the entities themselves, but to their instances
 
 ![pu pu pu](resources/UseCase.png)
 
@@ -60,9 +66,6 @@ All entities can be divided into 4 layers:
 3. `Functional Layer` contains in its entities all the functionality of the SDK that users may need.
 4. `Tools Layer` contains entities with various auxiliary functionality 
 required for the operation of the functional level.
-
-> There are 4 types of relationships in the diagram:\
-> ![relationships](resources/connections.png)
 
 ## Entities
 
