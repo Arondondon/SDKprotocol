@@ -18,6 +18,8 @@ but must maintain compatibility of all SDK interfaces with corresponding essenti
 
 ## User Flow
 
+> Note: This section includes mandatory requirements for implementation.
+
 This is a general scenario for an SDK user.
 
 #### Preparatory actions
@@ -52,11 +54,11 @@ services and organizations
 4. SNETEngine → MetadataProvider → OrgMetadata → functions for editing organization metadata, 
 as well as for publishing metadata to metadata provider, and downloading metadata from it
 
-> Note: On the following diagram the names of entities do not refer to the entities themselves, but to their instances
-
-![pu pu pu](resources/UseCase.png)
+![Use Case diagram](resources/UseCase.png)
 
 ## Structure
+
+> Note: The presented structure is just one possible implementation. It doesn't have to be followed in its entirety, but it's worth using as an example.
 
 ![Entities diagram](resources/ClassDiagram.png)
 
@@ -68,6 +70,8 @@ All entities can be divided into 4 layers:
 required for the operation of the functional level.
 
 ## Entities
+
+> Note: The presented structure and entities is just one possible implementation. It doesn't have to be followed in its entirety, but it's worth using as an example.
 
 - [Config Layer](#config-layer)
   1. [Account](#account)
@@ -758,6 +762,8 @@ wants to call the service once.
 
 ## Interfaces
 
+> Note: This section includes mandatory requirements for implementation.
+
 - [Smart Contracts](#smart-contracts)
 - [Storage Providers](#storage-providers)
 - [Daemon](#daemon)
@@ -826,6 +832,8 @@ Here are the functions of this contract that the SDK must be able to call
 1. `balanceOf` - returns balance of the wallet
 2. `allowance` - returns the allowance for spending
 3. `approve` - approves a spender (particularly MPE) to take a certain amount of your funds
+
+You can see the implementation of SingularityNET AGIX Token in Ethereum [here](https://etherscan.io/address/0x5B7533812759B45C2B44C19e320ba2cD2681b542)
 
 ### Storage Providers
 
